@@ -1,0 +1,32 @@
+# Secretos y credenciales
+.env
+*.env
+config.php
+credentials.txt
+**/credentials.txt
+
+# Logs
+*.log
+logs/
+/var/log/
+
+# Base de datos
+*.sqlite
+*.db
+*.sql.gz
+dump.sql
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Screenshots privadas
+screenshots/private/
