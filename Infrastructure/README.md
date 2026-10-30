@@ -58,3 +58,61 @@ After this we go to /var/www/html where I'll create my PHP script to be able to 
   } 
 ?>
 ```
+
+
+## ModSecurity Installation (WAF on Apache2)
+
+
+#### 1. Install packages
+```bash
+sudo apt update
+sudo apt install -y libapache2-mod-security2 modsecurity-crs
+```
+#### 2. Enable module and copy base configuration
+```bash
+sudo a2enmod security2
+sudo cp /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+```
+#### 4. Required parameters
+
+`/etc/apache2/mods-available/security2.conf`
+```bash
+#    <IfModule security2_module>
+#        IncludeOptional /etc/modsecurity/*.conf
+#        IncludeOptional /usr/share/modsecurity-crs/*.load
+#    </IfModule>
+```
+#### 5. Validate and reload
+```bash
+sudo apache2ctl configtest
+sudo systemctl reload apache2
+```
+#### 6. Test
+My recommendation is that you use two windows, one to be watching the logs that are generated and from the other to launch the query.
+```bash
+curl -G "http://localhost:8080/" --data-urlencode "id=1' OR '1'='1"
+sudo tail -f /var/log/apache2/modsec_audit.log
+```
+
+## Notes – Problems and solutions
+
+During the lab deployment, the following problems were resolved. They are documented for reproducibility and as a troubleshooting reference.
+
+#### Apache
+
+-  First I ingested the logs from /var/log/apache2/access.log and error.log, but the traffic pointing to my web page went to port 8080, instead of 80. `8080`. Apache served the request but logged it in `other_vhosts_access.log` .
+**Solution:** modify the 3 files so that port 8080 points to the logs ingested into Splunk.
+
+#### MariaDB
+
+- `general_log` disabled by default. Queries were not being logged. 
+**Solution:** uncomment the following lines in `/etc/mysql/mariadb.conf.d/50-server.cnf`
+ 
+ general_log_file = /var/log/mysql/mysql.log
+  general_log      = 1
+
+#### VM extremely slow
+
+
+- After installing ModSecurity and Suricata, my virtual machine started running extremely slowly 
+**Solution:**  Shut down the virtual machine and increase RAM to 8GB, in addition to lowering Suricata's `memcap`.
