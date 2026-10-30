@@ -63,7 +63,7 @@ After this we go to /var/www/html where I'll create my PHP script to be able to 
 ## ModSecurity Installation (WAF on Apache2)
 
 
-#### 1. Install packages
+#### 1. Install commands
 ```bash
 sudo apt update
 sudo apt install -y libapache2-mod-security2 modsecurity-crs
@@ -93,6 +93,38 @@ My recommendation is that you use two windows, one to be watching the logs that 
 curl -G "http://localhost:8080/" --data-urlencode "id=1' OR '1'='1"
 sudo tail -f /var/log/apache2/modsec_audit.log
 ```
+## Suricata Installation (IDS/IPS)
+
+#### 1. Install commands
+
+Remember that I'm using Linux.
+
+```bash 
+sudo apt update
+sudo apt install -y suricata suricata-update jq
+```
+#### 2. Edit this file `/etc/suricata/suricata.yaml`
+
+```bash
+
+    HOME_NET: "[127.0.0.0/8,::1/128,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12]"
+
+    af-packet:
+    - interface: YOURNETWORKINTERFACE
+    bpf-filter: "tcp port YOUSETTHISPORT"
+```
+#### 3. Download rules and Validate
+
+```bash 
+sudo suricata-update
+sudo suricata -T -c /etc/suricata/suricata.yaml -v
+```
+#### 4. Run and enable Suricata
+
+```bash
+sudo systemctl enable suricata
+sudo systemctl start suricata
+```
 
 ## Notes – Problems and solutions
 
@@ -109,7 +141,8 @@ During the lab deployment, the following problems were resolved. They are docume
 **Solution:** uncomment the following lines in `/etc/mysql/mariadb.conf.d/50-server.cnf`
  
  general_log_file = /var/log/mysql/mysql.log
-  general_log      = 1
+ 
+ general_log      = 1
 
 #### VM extremely slow
 
