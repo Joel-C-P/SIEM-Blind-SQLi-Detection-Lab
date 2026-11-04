@@ -86,3 +86,5 @@ Review related requests and responses, correlate available application and datab
 ```
 
 ![Jira ticket loaded](screenshots/03_loadjira.png)
+
+
