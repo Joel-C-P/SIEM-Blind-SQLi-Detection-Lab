@@ -53,35 +53,36 @@ At this point I apply a filter to capture the relevant parameters from the log `
 
 ![Jira Ticket](screenshots/02_jira.png)
 
+```
+ModSecurity detected an SQL injection attempt against the id parameter of GET /searchUsers.php on web_lab.
 
-######ModSecurity detected an SQL injection attempt against the id parameter of GET /searchUsers.php on web_lab.
+The request originated from 127.0.0.12:50511 and targeted 127.0.0.1:8080/searchUsers.php. The payload contained nested SELECT statements, GROUP_CONCAT, SUBSTRING and ASCII functions, attempting to test a character from concatenated username and password values in the users table. This is consistent with a boolean-based blind SQL injection attempt.
 
-######The request originated from 127.0.0.12:50511 and targeted 127.0.0.1:8080/searchUsers.php. The payload contained nested SELECT statements, GROUP_CONCAT, SUBSTRING and ASCII functions, attempting to test a character from concatenated username and password values in the users table. This is consistent with a boolean-based blind SQL injection attempt.
+Observed evidence:
 
-######Observed evidence:
+First attack: 11/2/26 6:10:35.000 AM
 
-######First attack: 11/2/26 6:10:35.000 AM
+Last attack: 11/2/26 6:10:43.000 AM
 
-######Last attack: 11/2/26 6:10:43.000 AM
+Transaction ID: auhvr_8Ubm0aUjNNem_3fQAAAAE.
 
-######Transaction ID: auhvr_8Ubm0aUjNNem_3fQAAAAE.
+SQLi rules triggered: 942100 and 942360.
 
-######SQLi rules triggered: 942100 and 942360.
+SQLi anomaly score: 10 and total inbound anomaly score: 13.
 
-######SQLi anomaly score: 10 and total inbound anomaly score: 13.
+ModSecurity engine mode: DETECTION_ONLY.
 
-######ModSecurity engine mode: DETECTION_ONLY.
+HTTP response: 404, with Content-Length: 0.
 
-######HTTP response: 404, with Content-Length: 0.
+User-Agent: python-requests/2.32.3.
 
-######User-Agent: python-requests/2.32.3.
+Initial assessment:
+The request contains a clear SQL injection payload. ModSecurity detected the attempt but did not block it because it was operating in detection-only mode. The HTTP 404 response does not establish whether the injected SQL executed successfully.
 
-######Initial assessment:
-######The request contains a clear SQL injection payload. ModSecurity detected the attempt but did not block it because it was operating in detection-only mode. The HTTP 404 response does not establish whether the injected SQL executed successfully.
+Successful exploitation and data extraction have not been confirmed. The scope and number of distinct malicious requests are still under investigation.
 
-######Successful exploitation and data extraction have not been confirmed. The scope and number of distinct malicious requests are still under investigation.
-
-######Next steps:
-######Review related requests and responses, correlate available application and database logs, and assess whether response differences indicate successful boolean-based inference.
+Next steps:
+Review related requests and responses, correlate available application and database logs, and assess whether response differences indicate successful boolean-based inference.
+```
 
 ![Jira ticket loaded](screenshots/03_loadjira.png)
