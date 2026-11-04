@@ -36,3 +36,14 @@ Suricata is also deployed but does not initially generate alerts for the tested 
 ## Scope
 
 A later improvement phase will introduce additional Suricata rules and compare detection results against the initial configuration.
+
+## 1. Initial Alert and Triage
+
+It's a normal day and while reviewing events, I see one from ModSecurity, and I ask myself a couple of questions before continuing: What triggered the detection? Does the detection make sense or is it a false positive? What system does it affect? And what impact does it present for the company? Taking a superficial look, I start seeing all the detection parameters.
+
+![ModSecurity Detection](screenshots/00_deteccion.png)
+
+I begin the part of filtering the most relevant information, for example I take the detection identifier.
+
+![Simple filter](screenshots/01_simple_filter.png)
+
