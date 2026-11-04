@@ -47,3 +47,41 @@ I begin the part of filtering the most relevant information, for example I take 
 
 ![Simple filter](screenshots/01_simple_filter.png)
 
+### Initial Evidence
+
+At this point I apply a filter to capture the relevant parameters from the log `/var/log/apache2/modsec_audit.log`. With all these parameters, my conclusion is that although I cannot know whether the attack was successful, by analyzing the request URI I can see it is an SQLi attack. I still cannot determine which type, but from its queries it is evident that the objective of the attack is to extract credentials from the database. Therefore, with the data I have available, I create a ticket in Jira and escalate it to Tier 2 immediately, since this attack is critical and recent, and could breach the confidentiality leg of the CIA triad. So I raise the ticket to SOC Tier 2 immediately and in parallel I will work on this incident by applying the playbook, but first I submit the ticket to Jira.
+
+![Jira Ticket](screenshots/02_jira.png)
+
+
+######ModSecurity detected an SQL injection attempt against the id parameter of GET /searchUsers.php on web_lab.
+
+######The request originated from 127.0.0.12:50511 and targeted 127.0.0.1:8080/searchUsers.php. The payload contained nested SELECT statements, GROUP_CONCAT, SUBSTRING and ASCII functions, attempting to test a character from concatenated username and password values in the users table. This is consistent with a boolean-based blind SQL injection attempt.
+
+######Observed evidence:
+
+######First attack: 11/2/26 6:10:35.000 AM
+
+######Last attack: 11/2/26 6:10:43.000 AM
+
+######Transaction ID: auhvr_8Ubm0aUjNNem_3fQAAAAE.
+
+######SQLi rules triggered: 942100 and 942360.
+
+######SQLi anomaly score: 10 and total inbound anomaly score: 13.
+
+######ModSecurity engine mode: DETECTION_ONLY.
+
+######HTTP response: 404, with Content-Length: 0.
+
+######User-Agent: python-requests/2.32.3.
+
+######Initial assessment:
+######The request contains a clear SQL injection payload. ModSecurity detected the attempt but did not block it because it was operating in detection-only mode. The HTTP 404 response does not establish whether the injected SQL executed successfully.
+
+######Successful exploitation and data extraction have not been confirmed. The scope and number of distinct malicious requests are still under investigation.
+
+######Next steps:
+######Review related requests and responses, correlate available application and database logs, and assess whether response differences indicate successful boolean-based inference.
+
+![Jira ticket loaded](screenshots/03_loadjira.png)
