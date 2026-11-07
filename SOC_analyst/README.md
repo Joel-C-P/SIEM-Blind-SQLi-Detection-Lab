@@ -87,4 +87,15 @@ Review related requests and responses, correlate available application and datab
 
 ![Jira ticket loaded](screenshots/03_loadjira.png)
 
+I start by doing a quick filtering based on the suspicious IP `127.0.0.12`, where I count all its requests containing a general part of the payload. By applying the following filter to obtain the JSON parameters from the mod_security logs, I get this data.
+
+![Splunk filter](screenshots/04_countRequests.png)
+
+Filtering based on the IP and the query with the payload, the first attack began at `127.0.0.12	2026-11-02 06:10:35.928` and for now ended at `127.0.0.12	2026-11-02 06:10:43.072`. With these data we can conclude that the attack lasted `7.144 seconds`.
+
+![Time frame](screenshots/05_time.png)
+
+We still cannot conclude whether there was credential theft. In the next step I will filter by status 200 and 404, since by observing the payload I can deduce that it is a boolean-based SQLi attack, but as I said before, I still cannot determine whether there was credential theft.
+
+## Validation
 
