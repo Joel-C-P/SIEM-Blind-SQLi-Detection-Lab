@@ -123,6 +123,126 @@ By applying the filter on the payload, isolating the ASCII code value and decodi
 
 With all this data collected, I state that a `blind boolean based SQLi` attack was received. I reviewed different Apache2, SQL, ModSecurity, and Suricata logs, in which I could observe that the attacker's IP `127.0.0.12` ceased its attack once it had obtained all the credentials from the `users` table in MySQL. Regarding the `CIA triad`, this decisively breaches the `confidentiality` component.
 
+## Jira Ticket Update state
+
+At this point I update Jira and mark the priority as high risk, and I leave a report with the necessary data for SOC Tier 2
+
+![Jira update](screenshots/12_jira_update.png )
+
+```
+INVESTIGATION UPDATE — Confirmed credential extraction
+
+1. Investigation findings
+
+Analysis of the available logs identified boolean-based blind SQL
+injection against the id parameter of GET /searchUsers.php on web_lab.
+
+Observed source IP: 127.0.0.12
+Destination: 127.0.0.1:8080
+Affected application: PHP application backed by MariaDB
+
+Observed request window:
+
+    First matching event: 2026-11-02 06:10:35.928
+
+    Last matching event: 2026-11-02 06:10:43.072
+
+    Observed duration: 7.144 seconds
+
+The filtered dataset contained 3,034 requests:
+
+    HTTP 404: 2,994
+
+    HTTP 200: 40
+
+These figures describe the reviewed dataset and do not establish
+
+the full duration or scope of activity outside the search window.
+
+2. Detection and validation
+
+ModSecurity triggered SQLi rules 942100 and 942360.
+The initial event recorded a SQLi anomaly score of 10 and a total
+inbound anomaly score of 13.
+
+ModSecurity operated in DETECTION_ONLY mode and did not block
+the requests.
+
+The payload used GROUP_CONCAT, SUBSTRING, ASCII, and conditional
+comparisons to infer characters from values in the users table.
+
+Credential extraction was confirmed through additional validation
+against the known laboratory credentials, rather than HTTP status
+codes alone.
+
+The initial transaction ID remains a reference to one request:
+auhvr_8Ubm0aUjNNem_3fQAAAAE.
+
+3. Confirmed impact and investigation limits
+
+Exposed credentials include:
+
+    Application user credentials.
+
+    PHP application administrator credentials.
+
+    MariaDB administrator credentials, as verified in the lab.
+
+Confidentiality loss is confirmed within the controlled exercise.
+
+Exposure of privileged credentials increases the potential impact
+on data integrity and service availability.
+
+Subsequent use of the exposed administrative credentials, data
+modification, and service disruption have not been confirmed.
+
+Review of available Apache, database, ModSecurity, and Suricata
+logs identified no further activity from 127.0.0.12 within the
+reviewed period after the last observed request.
+
+This observation does not establish that the attacker had no
+further activity through other sources or that containment occurred.
+
+4. Classification and escalation
+
+Classification: Authorized security test with a true-positive
+SQL injection detection and confirmed credential extraction.
+
+Priority: High under the investigation playbook.
+
+A simulated escalation to SOC Tier 2 has been performed.
+Critical-priority assessment is requested because administrative
+credentials were also exposed.
+
+The initial Tier 1 assessment and the subsequent laboratory
+validation are documented as separate investigation stages.
+
+5. Pending response actions
+
+    Preserve relevant evidence and record the investigation scope.
+
+    Restrict access to the vulnerable endpoint pending remediation.
+
+    Rotate exposed administrative credentials and securely reset
+      affected user passwords.
+
+    Revoke affected application sessions and review active database
+      connections.
+
+    Investigate privileged account activity across all source IPs.
+
+    Replace vulnerable SQL construction with parameterized queries.
+
+    Validate remediation through an authorized controlled retest.
+
+These actions are recommendations. Implementation and containment
+
+have not been confirmed.
+
+Status: Investigation remains open with SOC Tier 2 / Incident Response.
+```
+
+
 ## Recommended 
 
 The following actions are proposed based on the investigation findings. They remain pending unless implementation and validation evidence is documented.
