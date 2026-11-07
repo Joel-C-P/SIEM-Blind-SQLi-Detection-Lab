@@ -120,3 +120,17 @@ As can be seen in the image, since `97 = a` and the status code is 200, it can b
 ![ASCII decoded](screenshots/11_ascci_decode.png)
 
 By applying the filter on the payload, isolating the ASCII code value and decoding it to plain text as can be seen, I firmly state that the attacker achieved a credential theft from the SQL database.
+
+With all this data collected, I state that a `blind boolean based SQLi` attack was received. I reviewed different Apache2, SQL, ModSecurity, and Suricata logs, in which I could observe that the attacker's IP `127.0.0.12` ceased its attack once it had obtained all the credentials from the `users` table in MySQL. Regarding the `CIA triad`, this decisively breaches the `confidentiality` component.
+
+## Recommended 
+
+The following actions are proposed based on the investigation findings. They remain pending unless implementation and validation evidence is documented.
+
+| Priority | Recommendation | Responsible team |
+|---|---|---|
+| Immediate | Notify the incident lead that both PHP application administrator and MariaDB administrator credentials were exposed. | SOC Tier 2 / Incident Response |
+| Immediate | Rotate the exposed administrative credentials through a trusted management channel. Coordinate any dependent application configuration updates and verify service operation. | Database Administration / Application team |
+| Immediate | Revoke PHP administrator sessions and tokens. Review and terminate unauthorized active database connections; password rotation alone must not be assumed to terminate existing sessions. | Application team / Database Administration |
+| Immediate | Preserve available database, application, authentication, and web server logs before making changes that could destroy evidence. Record containment actions and timestamps. | Incident Response / SOC |
+| High | Investigate privileged account activity across all source IPs, including new accounts, privilege changes, database modifications, and changes to application files or configuration. | SOC Tier 2 / Incident Response |
