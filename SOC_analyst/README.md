@@ -99,3 +99,24 @@ We still cannot conclude whether there was credential theft. In the next step I 
 
 ## Validation
 
+By applying another filter based on the status code, the suspicious IP, and part of the payload, I discovered that the attacker made `3034` brute-force requests, of which `2994` responses returned a 404 and `40` were 200 OK.
+
+![Successful status code](screenshots/06_status_code.png)
+
+![Status code comparison](screenshots/07_status_code.png)
+
+At this point I notice a suspicious pattern in the probability of the 200 status code responses. Right now, with the data I have in Jira, I change the escalation to SOC Tier 2 from `MEDIUM` to `High risk`, since we cannot afford any more time. In parallel I am going to URL-decode the payload and apply reverse engineering. First I will apply a SPL filter with the condition that shows me the queries containing a `200` status code response from the web server side.
+
+![URL-decoded filter](screenshots/08_urldecode.png)
+
+Analyzing the payload I observe the use of `:` in hexadecimal such as `0x3a` and that it uses the ASCII method together with the `substring` method, where it takes only the first letter of users for example, converts it to ASCII code and compares it with another letter that is also in ASCII code. In this case it starts with `97`=`a`; 97 in ASCII code represents the letter "a".
+
+![ASCII](screenshots/09_ascii.png)
+
+As can be seen in the image, since `97 = a` and the status code is 200, it can be inferred that the attack obtained the first character. Now I will apply the same to the rest to see if it completes a word; likewise, passwords should not be stored in plain text, but at minimum encrypted in a hash.
+
+![Splunk filter ASCII number](screenshots/10_filtro_ascii.png)
+
+![ASCII decoded](screenshots/11_ascci_decode.png)
+
+By applying the filter on the payload, isolating the ASCII code value and decoding it to plain text as can be seen, I firmly state that the attacker achieved a credential theft from the SQL database.
